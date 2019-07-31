@@ -42,7 +42,6 @@ public class MisraGries {
                 } else {
                     data.put(weight, counter);
                 }
-
             }
         }
         return data;
