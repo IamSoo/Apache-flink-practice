@@ -1,4 +1,4 @@
-package MSBD5014;
+package practice;
 
 import java.util.Map;
 

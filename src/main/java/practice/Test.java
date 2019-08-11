@@ -1,4 +1,4 @@
-package MSBD5014;
+package practice;
 
 import javax.sound.midi.Soundbank;
 import java.util.stream.IntStream;

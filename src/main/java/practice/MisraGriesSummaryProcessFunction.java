@@ -1,8 +1,5 @@
-package MSBD5014;
+package practice;
 
-import org.apache.flink.api.common.functions.RichFlatMapFunction;
-import org.apache.flink.api.common.state.MapState;
-import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -62,12 +59,12 @@ public class MisraGriesSummaryProcessFunction extends ProcessFunction<Tuple2<Str
 
     }
 
-    @Override
+  /*  @Override
     public void onTimer(long timestamp, OnTimerContext ctx, Collector<Tuple2<String, Map<String, Integer>>> out)
             throws Exception {
         // get the state for the key that scheduled the timer
         Summary result = summaryValueState.value();
         out.collect(new Tuple2<String, Map<String, Integer>>(result.key, result.summaryCount));
-    }
+    }*/
 
 }
