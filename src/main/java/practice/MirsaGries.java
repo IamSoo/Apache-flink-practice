@@ -17,9 +17,9 @@ public class MirsaGries<T> implements iMirsaGries<T> {
     public void insert(T data) {
         Integer count = countersMap.get(data);
         if (count != null) {
-            doAdd(data, count + 1);
+            countersMap.put(data, count + 1);
         } else if (countersMap.size() < size - 1) {
-            doAdd(data, 1);
+            countersMap.put(data, 1);
         } else {
             Iterator<Map.Entry<T, Integer>> it = countersMap.entrySet().iterator();
             while (it.hasNext()) {

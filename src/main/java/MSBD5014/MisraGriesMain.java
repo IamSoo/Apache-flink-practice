@@ -10,9 +10,8 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class MisraGriesMain {
 
@@ -21,7 +20,7 @@ public class MisraGriesMain {
                 env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setStreamTimeCharacteristic(TimeCharacteristic.IngestionTime);
         DataStream<String> dataStream = loadDataFromFile(env);
-        env.setParallelism(2);
+        env.setParallelism(1);
         DataStream<Tuple2<Long, Integer>> flatMapSummary =
                 dataStream.map(new MapFunction<String, Long>() {
                     @Override
@@ -37,33 +36,33 @@ public class MisraGriesMain {
                             @Override
                             public void apply(TimeWindow timeWindow, Iterable<Tuple2<Long, Integer>> iterable, Collector<Map<Long, Integer>> collector) throws Exception {
                                 int k = 4;
-                                HashMap<Long, Integer> resultMap = new HashMap<>();
+                                Map<Long, Integer> resultMap = new HashMap<>();
                                 for (Tuple2<Long, Integer> eachTuple : iterable) {
                                     resultMap.put(eachTuple.f0, eachTuple.f1);
                                 }
-                                //Summary
-                                int i = 0, count = 0;
-                                if (resultMap.size() >= k) {
-                                    for (Iterator<Long> pairs = resultMap.keySet().iterator(); pairs.hasNext() && i < k; i++) {
-                                        Long key = pairs.next();
-                                        count = resultMap.get(key);
+                                int count = 0;
+                                //count the least value
+                                count = resultMap
+                                        .values()
+                                        .stream()
+                                        .min(Integer::compare)
+                                        .get();
+
+                                Iterator<Map.Entry<Long, Integer>> iterator = resultMap.entrySet().iterator();
+                                while (iterator.hasNext()) {
+                                    Map.Entry<Long, Integer> entry = iterator.next();
+                                    int c = entry.getValue();
+                                    c -= count;
+                                    resultMap.put(entry.getKey(), c);
+                                    if (c <= 0) {
+                                        iterator.remove();
                                     }
-                                    Iterator<Map.Entry<Long, Integer>> iterator = resultMap.entrySet().iterator();
-                                    while (iterator.hasNext()) {
-                                        Map.Entry<Long, Integer> entry = iterator.next();
-                                        int c = entry.getValue();
-                                        c -= count;
-                                        resultMap.put(entry.getKey(), c);
-                                        if (c <= 0) {
-                                            iterator.remove();
-                                        }
-                                    }
+
                                 }
                                 collector.collect(resultMap);
                             }
                         });
         mapDataStream.print();
-        //mapDataStream.print();
         env.execute();
     }
 

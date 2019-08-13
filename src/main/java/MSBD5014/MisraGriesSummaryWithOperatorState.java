@@ -21,6 +21,7 @@ public class MisraGriesSummaryWithOperatorState extends RichFlatMapFunction<Long
     private List<Tuple2<Long, Integer>> listBufferElements;
     private final int size = 4;
 
+
     @Override
     public void snapshotState(FunctionSnapshotContext functionSnapshotContext) throws Exception {
         checkPointCountList.clear();
@@ -48,12 +49,12 @@ public class MisraGriesSummaryWithOperatorState extends RichFlatMapFunction<Long
     }
 
     @Override
-    public void flatMap(Long inputEvent, Collector<Tuple2<Long, Integer>> collector) throws Exception {
+    public void flatMap(Long inputEvent, Collector<Tuple2<Long, Integer>> collector) {
         if (listBufferElements.size() > 0) {
             boolean newlyAdded = false;
             for (int i = 0; i < listBufferElements.size(); i++) {
                 if (listBufferElements.get(i).f0.equals(inputEvent)) {
-                    int count = 0;
+                    int count;
                     count = listBufferElements.get(i).f1;
                     count++;
                     listBufferElements.set(i, Tuple2.of(listBufferElements.get(i).f0, count));
@@ -65,11 +66,9 @@ public class MisraGriesSummaryWithOperatorState extends RichFlatMapFunction<Long
             }
 
             if (listBufferElements.size() >= size - 1) {
-                Iterator<Tuple2<Long, Integer>> it = listBufferElements.iterator();
                 List<Tuple2<Long, Integer>> localList = new ArrayList<>();
                 for (int i = 0; i < listBufferElements.size(); i++) {
                     Tuple2<Long, Integer> oldSummary = listBufferElements.get(i);
-                    Long innerKey = oldSummary.f0;
                     int innerCount = oldSummary.f1;
                     innerCount--;
                     if (innerCount != 0) {
