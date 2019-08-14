@@ -20,7 +20,7 @@ public class MisraGriesMain {
                 env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setStreamTimeCharacteristic(TimeCharacteristic.IngestionTime);
         DataStream<String> dataStream = loadDataFromFile(env);
-        env.setParallelism(1);
+        env.setParallelism(3);
         DataStream<Tuple2<Long, Integer>> flatMapSummary =
                 dataStream.map(new MapFunction<String, Long>() {
                     @Override
@@ -28,7 +28,7 @@ public class MisraGriesMain {
                         return Long.valueOf(s);
                     }
                 })
-         .flatMap(new MisraGriesSummaryWithOperatorState());
+         .flatMap(new MisraGriesSummaryWithOperatorState()).setParallelism(1);
 
         DataStream<Map<Long, Integer>> mapDataStream =
                 flatMapSummary.timeWindowAll(Time.seconds(3))
