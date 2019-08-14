@@ -38,5 +38,7 @@ tar xf kafka_2.12-2.2.0.tgz
 Run KafkaConsumerTest passing arguments as :
 --topic test --bootstrap.servers localhost:9092 --zookeeper.connect localhost:2181 --group.id myGroup
 
-
+### Current Project Info
+This project contains few examples of Flink basic programs.It also contains Misra-Gries implementation 
+using flink operator-state.
 
